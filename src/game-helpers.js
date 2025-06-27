@@ -1,55 +1,33 @@
-/**
- * Thanks to Github user dylano for supplying a more-accurate
- * solving algorithm!
- */
-
 export function checkGuess(guess, answer) {
-  // This constant is a placeholder that indicates we've successfully
-  // dealt with this character (it's correct, or misplaced).
-  const SOLVED_CHAR = '✓';
+  if (!guess) return null;
 
-  if (!guess) {
-    return null;
-  }
+  const SOLVED = "✓";
+  const guessChars = guess.toUpperCase().split("");
+  const answerChars = [...answer.split("")]; // shallow copy
+  const result = new Array(guessChars.length);
 
-  const guessChars = guess.toUpperCase().split('');
-  const answerChars = answer.split('');
-
-  const result = [];
-
-  // Step 1: Look for correct letters.
-  for (let i = 0; i < guessChars.length; i++) {
-    if (guessChars[i] === answerChars[i]) {
-      result[i] = {
-        letter: guessChars[i],
-        status: 'correct',
-      };
-      answerChars[i] = SOLVED_CHAR;
-      guessChars[i] = SOLVED_CHAR;
+  // Step 1: Mark correct positions
+  guessChars.forEach((char, i) => {
+    if (char === answerChars[i]) {
+      result[i] = { letter: char, status: "correct" };
+      answerChars[i] = SOLVED;
+      guessChars[i] = SOLVED;
     }
-  }
+  });
 
-  // Step 2: look for misplaced letters. If it's not misplaced,
-  // it must be incorrect.
-  for (let i = 0; i < guessChars.length; i++) {
-    if (guessChars[i] === SOLVED_CHAR) {
-      continue;
-    }
+  // Step 2: Check misplaced/incorrect letters
+  guessChars.forEach((char, i) => {
+    if (char === SOLVED) return;
 
-    let status = 'incorrect';
-    const misplacedIndex = answerChars.findIndex(
-      (char) => char === guessChars[i]
-    );
+    const misplacedIndex = answerChars.findIndex((c) => c === char);
+    const status = misplacedIndex >= 0 ? "misplaced" : "incorrect";
+
     if (misplacedIndex >= 0) {
-      status = 'misplaced';
-      answerChars[misplacedIndex] = SOLVED_CHAR;
+      answerChars[misplacedIndex] = SOLVED;
     }
 
-    result[i] = {
-      letter: guessChars[i],
-      status,
-    };
-  }
+    result[i] = { letter: char, status };
+  });
 
   return result;
 }
